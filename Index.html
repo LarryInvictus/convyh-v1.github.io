@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ConvYH V1</title>
+  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
+<body>
+
+  <!-- Title Bar -->
+  <div class="title-bar">
+    <div class="title-main">ConvYH V1</div>
+    <div class="title-beta">In beta!</div>
+  </div>
+
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- MAIN HOME SCREEN -->
+  <div id="homeScreen" class="content">
+    <h1>Welcome</h1>
+    <p>Pick something to jump into.</p>
+    <p>Version 0.1, brought to you by LarryInvictus (Darrell).</p>
+  </div>
+
+  <!-- Quote Box -->
+  <div class="quote-box" id="quoteBox">"Made with HTML, JS, and I forgot!"</div>
+
+  <!-- Dock Wrapper -->
+  <div class="dock-wrapper">
+    <div class="dock">
+      <button class="dock-btn" id="gamesBtn">Entertainment</button>
+      <button class="dock-btn" id="appsBtn">Apps</button>
+      <button class="dock-btn" id="browserBtn">Browser</button>
+    </div>
+  </div>
+
+  <!-- Entertainment Menu -->
+  <div class="menu-panel" id="gamesMenu">
+    <a href="#" onclick="openInBrowser('https://darrell.acphighschool.org/#zones/retrobowl/html')">Retro Bowl</a>
+    <a href="#" onclick="openInBrowser('https://darrell.acphighschool.org')">UniUB V4 by jobi</a>
+    <a href="#">More Coming Soon</a>
+  </div>
+
+  <!-- Apps Menu -->
+  <div class="menu-panel" id="appsMenu">
+    <a href="#">Calculator</a>
+    <a href="#">Notes</a>
+    <a href="#">More Apps Soon</a>
+  </div>
+
+  <!-- BROWSER SCREEN -->
+  <div id="browserScreen" class="browser">
+    <div class="browser-top">
+      <div id="tabs" class="tabs"></div>
+      <button id="addTab" class="add-tab">+</button>
+    </div>
+
+    <div class="browser-search">
+      <input id="searchInput" type="text" placeholder="Search or enter URL" />
+      <button id="goBtn">Go</button>
+      <button id="closeBrowser">X</button>
+    </div>
+
+    <iframe id="browserFrame" class="browser-frame" src=""></iframe>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+        </html>
