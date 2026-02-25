@@ -1,11 +1,1 @@
-import express from "express";
-import { createProxyMiddleware } from "http-proxy-middleware";
-
-const app = express();
-
-app.use("/api", createProxyMiddleware({
-  target: "https://example.com",
-  changeOrigin: true
-}));
-
-app.listen(3000);
+<iframe src="https://retro-bowl.co" width="800" height="600"></iframe>
