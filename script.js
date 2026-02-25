@@ -149,8 +149,10 @@ const browserFrame = document.getElementById("browserFrame");
 let tabs = [];
 let activeTab = null;
 
-function createTab(url = "https://duckduckgo.com") {
-  const id = Date.now();
+const HOMEPAGE = "conv-home://";
+
+function createTab(url = HOMEPAGE) {
+  const id = Date.now() + Math.random();
   const tab = { id, url };
   tabs.push(tab);
   activeTab = id;
@@ -163,7 +165,9 @@ function renderTabs() {
   tabs.forEach(tab => {
     const tabEl = document.createElement("div");
     tabEl.className = "tab" + (tab.id === activeTab ? " active" : "");
-    tabEl.textContent = tab.url.replace("https://", "").slice(0, 12);
+    tabEl.textContent = tab.url === HOMEPAGE
+      ? "Home"
+      : tab.url.replace("https://", "").replace("http://", "").slice(0, 12);
 
     tabEl.onclick = () => {
       activeTab = tab.id;
@@ -193,23 +197,44 @@ function closeTab(id) {
 }
 
 function loadTab(tab) {
-  browserFrame.src = tab.url;
-  searchInput.value = tab.url;
+  if (tab.url === HOMEPAGE) {
+    browserFrame.srcdoc = `
+      <style>
+        body {
+          background: #000;
+          color: #a855f7;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          font-size: 2rem;
+          font-family: Arial, sans-serif;
+        }
+      </style>
+      <div>Search something!</div>
+    `;
+    searchInput.value = "";
+  } else {
+    browserFrame.srcdoc = "";
+    browserFrame.src = tab.url;
+    searchInput.value = tab.url;
+  }
 }
 
 function goToURL() {
   let input = searchInput.value.trim();
   if (!input) return;
 
-  if (!input.includes(" ") && !input.startsWith("http")) {
+  // If it's a search (contains spaces), use DuckDuckGo
+  if (input.includes(" ")) {
+    input = "https://duckduckgo.com/?q=" + encodeURIComponent(input);
+  } else if (!input.startsWith("http")) {
     input = "https://" + input;
   }
 
-  if (input.includes(" ")) {
-    input = "https://duckduckgo.com/?q=" + encodeURIComponent(input);
-  }
-
   const tab = tabs.find(t => t.id === activeTab);
+  if (!tab) return;
+
   tab.url = input;
   loadTab(tab);
   renderTabs();
@@ -274,4 +299,4 @@ function openInBrowser(url) {
   appsMenu.style.display = "none";
 
   createTab(url);
-                }
+    }
