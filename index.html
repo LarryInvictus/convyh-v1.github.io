@@ -38,16 +38,16 @@
 
   <!-- Entertainment Menu -->
   <div class="menu-panel" id="gamesMenu">
-    <a href="#" onclick="openInBrowser('https://darrell.acphighschool.org/#zones/retrobowl/html')">Retro Bowl</a>
-    <a href="#" onclick="openInBrowser('https://darrell.acphighschool.org')">UniUB V4 by jobi</a>
+    <a href="#" onclick="openEmbed('https://darrell.acphighschool.org/#zones/retrobowl/html')">Retro Bowl</a>
+    <a href="#" onclick="openEmbed('https://darrell.acphighschool.org')">UniUB V4 by jobi</a>
     <a href="#">More Coming Soon</a>
   </div>
 
   <!-- Apps Menu -->
   <div class="menu-panel" id="appsMenu">
-    <a href="#">Calculator</a>
-    <a href="#">Notes</a>
-    <a href="#">More Apps Soon</a>
+    <a href="#" onclick="openEmbed('https://www.desmos.com/scientific')">Calculator</a>
+    <a href="#" onclick="openEmbed('https://notes.io')">Notes</a>
+    <a href="#" onclick="openEmbed('https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes')">Docs</a>
   </div>
 
   <!-- BROWSER SCREEN -->
@@ -64,8 +64,22 @@
     </div>
 
     <iframe id="browserFrame" class="browser-frame" src=""></iframe>
+
+    <!-- Tab context menu -->
+    <div id="tabContextMenu" class="tab-context-menu">
+      <div data-action="pin">Pin / Unpin</div>
+      <div data-action="close">Close</div>
+      <div data-action="closeOthers">Close others</div>
+      <div data-action="closeAll">Close all</div>
+    </div>
+  </div>
+
+  <!-- EMBED WINDOW (Entertainment / Apps) -->
+  <div id="embedScreen" class="embed">
+    <button id="closeEmbed" class="embed-close">X</button>
+    <iframe id="embedFrame" class="embed-frame"></iframe>
   </div>
 
   <script src="script.js"></script>
 </body>
-        </html>
+    </html>
