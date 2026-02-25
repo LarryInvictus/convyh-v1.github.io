@@ -1,0 +1,215 @@
+/* Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: white;
+}
+
+/* Title Bar */
+.title-bar {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.title-main {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #e9d5ff;
+  text-shadow: 0 0 10px #a855f7;
+}
+
+.title-beta {
+  font-size: 1rem;
+  color: #c084fc;
+  opacity: 0.8;
+  transform: rotate(-10deg);
+}
+
+/* Particle Canvas */
+#particleCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Home Screen */
+.content {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+}
+
+/* Quote Box */
+.quote-box {
+  position: fixed;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  background: rgba(24, 24, 27, 0.7);
+  border: 1px solid #a855f7;
+  border-radius: 14px;
+  color: #e9d5ff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: 0.2s;
+  z-index: 2;
+}
+
+.quote-box:hover {
+  background: rgba(168, 85, 247, 0.3);
+  transform: translateX(-50%) scale(1.03);
+}
+
+/* Dock Wrapper */
+.dock-wrapper {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* Dock */
+.dock {
+  display: flex;
+  gap: 1rem;
+}
+
+.dock-btn {
+  padding: 0.7rem 1.4rem;
+  background: rgba(30, 30, 30, 0.8);
+  border: 1px solid #a855f7;
+  border-radius: 10px;
+  color: #e9d5ff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: 0.2s;
+}
+
+.dock-btn:hover {
+  background: rgba(168, 85, 247, 0.3);
+}
+
+/* Menus */
+.menu-panel {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 20, 0.9);
+  border: 1px solid #a855f7;
+  border-radius: 10px;
+  padding: 1rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 9;
+}
+
+.menu-panel a {
+  color: #e9d5ff;
+  text-decoration: none;
+  padding: 0.4rem;
+  border-radius: 6px;
+}
+
+.menu-panel a:hover {
+  background: rgba(168, 85, 247, 0.3);
+}
+
+/* Browser Fullscreen */
+.browser {
+  position: fixed;
+  inset: 0;
+  background: #0a0a0a;
+  display: none;
+  flex-direction: column;
+  z-index: 5;
+}
+
+.browser.active {
+  display: flex;
+}
+
+/* Browser Top Bar */
+.browser-top {
+  display: flex;
+  align-items: center;
+  background: #1a1a1a;
+  padding: 0.5rem;
+  border-bottom: 1px solid #333;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 0.4rem 0.8rem;
+  background: #2a2a2a;
+  border-radius: 6px;
+  color: #ddd;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab.active {
+  background: #a855f7;
+  color: #000;
+}
+
+.close-tab {
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+/* Search Bar */
+.browser-search {
+  display: flex;
+  padding: 0.5rem;
+  background: #111;
+  gap: 0.5rem;
+}
+
+.browser-search input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #222;
+  color: #eee;
+}
+
+.browser-search button {
+  padding: 0.5rem 1rem;
+  background: #a855f7;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Browser Frame */
+.browser-frame {
+  flex: 1;
+  border: none;
+  background: #000;
+    }
