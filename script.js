@@ -1,97 +1,159 @@
-// =====================
-// PARTICLE BACKGROUND
-// =====================
+/* ============================================================
+   ELEMENT REFERENCES
+============================================================ */
 const canvas = document.getElementById("particleCanvas");
 const ctx = canvas.getContext("2d");
 
-let particles = [];
-const particleCount = 120;
-const maxVelocity = 0.4;
-const connectionDistance = 130;
+const homeScreen = document.getElementById("homeScreen");
+const quoteBox = document.getElementById("quoteBox");
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+const gamesMenu = document.getElementById("gamesMenu");
+const appsMenu = document.getElementById("appsMenu");
+
+const browserScreen = document.getElementById("browserScreen");
+const tabsContainer = document.getElementById("tabs");
+const addTabBtn = document.getElementById("addTab");
+const searchInput = document.getElementById("searchInput");
+const goBtn = document.getElementById("goBtn");
+const closeBrowserBtn = document.getElementById("closeBrowser");
+const browserFrame = document.getElementById("browserFrame");
+
+const embedScreen = document.getElementById("embedScreen");
+const embedFrame = document.getElementById("embedFrame");
+const closeEmbedBtn = document.getElementById("closeEmbed");
+
+const settingsScreen = document.getElementById("settingsScreen");
+const closeSettingsBtn = document.getElementById("closeSettings");
+
+const homeIcon = document.getElementById("homeIcon");
+const gamesIcon = document.getElementById("gamesIcon");
+const appsIcon = document.getElementById("appsIcon");
+const browserIcon = document.getElementById("browserIcon");
+const settingsIcon = document.getElementById("settingsIcon");
+
+const styleSelect = document.getElementById("styleSelect");
+const themeSelect = document.getElementById("themeSelect");
+const animationSelect = document.getElementById("animationSelect");
+const particlesToggle = document.getElementById("particlesToggle");
+const particleDensitySelect = document.getElementById("particleDensity");
+const ambienceToggle = document.getElementById("ambienceToggle");
+const ambienceVolume = document.getElementById("ambienceVolume");
+const soundToggle = document.getElementById("soundToggle");
+const resetSettingsBtn = document.getElementById("resetSettings");
+
+const ambienceAudio = document.getElementById("ambienceAudio");
+
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+let particles = [];
+let particleDensity = 120;
+let particlesEnabled = true;
+
+let tabs = [];
+let activeTabId = null;
+const HOMEPAGE = "conv-home://";
+
+let browserOpen = false;
+let uiSoundsEnabled = false;
+
+/* ============================================================
+   UTILITY FUNCTIONS
+============================================================ */
+function showHome() {
+  homeScreen.style.display = "block";
+  quoteBox.style.display = "block";
+  canvas.style.display = "block";
+
+  gamesMenu.style.display = "none";
+  appsMenu.style.display = "none";
+  browserScreen.style.display = "none";
+  embedScreen.style.display = "none";
+  settingsScreen.style.display = "none";
 }
-window.addEventListener("resize", resizeCanvas);
+
+function hideHome() {
+  homeScreen.style.display = "none";
+  quoteBox.style.display = "none";
+  canvas.style.display = "none";
+}
+
+function playUISound() {
+  if (!uiSoundsEnabled) return;
+
+  try {
+    const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctxAudio.createOscillator();
+    const gain = ctxAudio.createGain();
+
+    osc.type = "square";
+    osc.frequency.value = 600;
+    gain.gain.value = 0.03;
+
+    osc.connect(gain);
+    gain.connect(ctxAudio.destination);
+
+    osc.start();
+    setTimeout(() => {
+      osc.stop();
+      ctxAudio.close();
+    }, 80);
+  } catch (e) {}
+}
+
+/* ============================================================
+   PARTICLES
+============================================================ */
+function resizeCanvas() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
 resizeCanvas();
+addEventListener("resize", resizeCanvas);
 
 function createParticles() {
   particles = [];
-  for (let i = 0; i < particleCount; i++) {
+  for (let i = 0; i < particleDensity; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * maxVelocity,
-      vy: (Math.random() - 0.5) * maxVelocity,
-      radius: Math.random() * 2 + 1,
-      alpha: Math.random() * 0.6 + 0.2
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2 + 1
     });
   }
 }
+createParticles();
 
-function updateParticles() {
-  for (const p of particles) {
+function drawParticles() {
+  if (!particlesEnabled) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    requestAnimationFrame(drawParticles);
+    return;
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(168,85,247,0.7)";
+
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+
     p.x += p.vx;
     p.y += p.vy;
 
     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-  }
+  });
+
+  requestAnimationFrame(drawParticles);
 }
+drawParticles();
 
-function drawParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  for (const p of particles) {
-    ctx.beginPath();
-    const gradient = ctx.createRadialGradient(
-      p.x, p.y, 0,
-      p.x, p.y, p.radius * 4
-    );
-    gradient.addColorStop(0, `rgba(216, 180, 254, ${p.alpha})`);
-    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-    ctx.fillStyle = gradient;
-    ctx.arc(p.x, p.y, p.radius * 4, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  for (let i = 0; i < particles.length; i++) {
-    for (let j = i + 1; j < particles.length; j++) {
-      const p1 = particles[i];
-      const p2 = particles[j];
-      const dx = p1.x - p2.x;
-      const dy = p1.y - p2.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < connectionDistance) {
-        const alpha = 1 - dist / connectionDistance;
-        ctx.strokeStyle = `rgba(168, 85, 247, ${alpha * 0.4})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.stroke();
-      }
-    }
-  }
-}
-
-function animate() {
-  updateParticles();
-  drawParticles();
-  requestAnimationFrame(animate);
-}
-
-createParticles();
-animate();
-
-
-// =====================
-// QUOTE SYSTEM
-// =====================
-const quoteBox = document.getElementById("quoteBox");
-
+/* ============================================================
+   QUOTES
+============================================================ */
 const quotes = [
   "Man I dont know why I made this",
   "Can someone like...tell Roblox to chill",
@@ -99,180 +161,107 @@ const quotes = [
   "Yes Kevin we all know the entertainment is broken"
 ];
 
-function showRandomQuote() {
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  quoteBox.textContent = `"${quotes[randomIndex]}"`;
-}
+quoteBox.addEventListener("click", () => {
+  quoteBox.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+});
 
-quoteBox.addEventListener("click", showRandomQuote);
-
-
-// =====================
-// MENU SYSTEM
-// =====================
-const entertainmentBtn = document.getElementById("gamesBtn");
-const appsBtn = document.getElementById("appsBtn");
-const entertainmentMenu = document.getElementById("gamesMenu");
-const appsMenu = document.getElementById("appsMenu");
-
+/* ============================================================
+   MENUS (ENTERTAINMENT / APPS)
+============================================================ */
 function toggleMenu(menu) {
-  entertainmentMenu.style.display = "none";
+  const isOpen = menu.style.display === "block";
+  gamesMenu.style.display = "none";
   appsMenu.style.display = "none";
-  menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+
+  if (!isOpen) menu.style.display = "block";
 }
 
-entertainmentBtn.addEventListener("click", () => toggleMenu(entertainmentMenu));
-appsBtn.addEventListener("click", () => toggleMenu(appsMenu));
+gamesIcon.addEventListener("click", () => {
+  playUISound();
+  toggleMenu(gamesMenu);
+});
+
+appsIcon.addEventListener("click", () => {
+  playUISound();
+  toggleMenu(appsMenu);
+});
 
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".dock") && !e.target.closest(".menu-panel")) {
-    entertainmentMenu.style.display = "none";
+    gamesMenu.style.display = "none";
     appsMenu.style.display = "none";
   }
 });
 
-
-// =====================
-// EMBED SYSTEM (Entertainment / Apps)
-// =====================
-const embedScreen = document.getElementById("embedScreen");
-const embedFrame = document.getElementById("embedFrame");
-const closeEmbed = document.getElementById("closeEmbed");
-const homeScreen = document.getElementById("homeScreen");
-
+/* ============================================================
+   EMBED SYSTEM
+============================================================ */
 function openEmbed(url) {
+  playUISound();
+  hideHome();
+
+  gamesMenu.style.display = "none";
+  appsMenu.style.display = "none";
+  browserScreen.style.display = "none";
+  settingsScreen.style.display = "none";
+
   embedScreen.style.display = "flex";
   embedFrame.src = url;
-
-  homeScreen.style.display = "none";
-  quoteBox.style.display = "none";
-  canvas.style.display = "none";
-  entertainmentMenu.style.display = "none";
-  appsMenu.style.display = "none";
-  browserScreen.classList.remove("active");
 }
 
-closeEmbed.onclick = () => {
+closeEmbedBtn.addEventListener("click", () => {
+  playUISound();
   embedScreen.style.display = "none";
   embedFrame.src = "";
-  homeScreen.style.display = "flex";
-  quoteBox.style.display = "block";
-  canvas.style.display = "block";
-};
+  showHome();
+});
 
-
-// =====================
-// BROWSER SYSTEM
-// =====================
-const browserBtn = document.getElementById("browserBtn");
-const browserScreen = document.getElementById("browserScreen");
-
-const tabsContainer = document.getElementById("tabs");
-const addTabBtn = document.getElementById("addTab");
-const searchInput = document.getElementById("searchInput");
-const goBtn = document.getElementById("goBtn");
-const closeBrowser = document.getElementById("closeBrowser");
-const browserFrame = document.getElementById("browserFrame");
-const tabContextMenu = document.getElementById("tabContextMenu");
-
-let tabs = [];
-let activeTab = null;
-const HOMEPAGE = "conv-home://";
-
-function createTab(url = HOMEPAGE, pinned = false) {
+/* ============================================================
+   BROWSER SYSTEM
+============================================================ */
+function createTab(url = HOMEPAGE) {
   const id = Date.now() + Math.random();
-  const tab = { id, url, pinned };
-  tabs.push(tab);
-  activeTab = id;
+  tabs.push({ id, url });
+  activeTabId = id;
   renderTabs();
-  loadTab(tab);
-}
-
-function getActiveTab() {
-  return tabs.find(t => t.id === activeTab) || null;
-}
-
-function labelForTab(tab) {
-  if (tab.url === HOMEPAGE) return "Home";
-  try {
-    const u = new URL(tab.url);
-    return u.hostname.replace("www.", "");
-  } catch {
-    return tab.url.slice(0, 12);
-  }
+  loadActiveTab();
 }
 
 function renderTabs() {
   tabsContainer.innerHTML = "";
 
-  const sorted = [...tabs].sort((a, b) => {
-    if (a.pinned && !b.pinned) return -1;
-    if (!a.pinned && b.pinned) return 1;
-    return 0;
-  });
+  tabs.forEach(tab => {
+    const el = document.createElement("div");
+    el.className = "tab" + (tab.id === activeTabId ? " active" : "");
+    el.textContent = tab.url === HOMEPAGE ? "Home" : tab.url.replace(/^https?:\/\//, "").slice(0, 15);
 
-  sorted.forEach(tab => {
-    const tabEl = document.createElement("div");
-    tabEl.className = "tab" +
-      (tab.id === activeTab ? " active" : "") +
-      (tab.pinned ? " pinned" : "");
-    tabEl.dataset.id = tab.id;
-    tabEl.textContent = labelForTab(tab);
+    el.addEventListener("click", () => {
+      activeTabId = tab.id;
+      loadActiveTab();
+      renderTabs();
+    });
 
     const closeBtn = document.createElement("span");
-    closeBtn.className = "close-tab";
-    closeBtn.textContent = "×";
-    closeBtn.onclick = (e) => {
+    closeBtn.textContent = " ×";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       closeTab(tab.id);
-    };
-
-    tabEl.appendChild(closeBtn);
-
-    tabEl.onclick = () => {
-      activeTab = tab.id;
-      loadTab(tab);
-      renderTabs();
-      searchInput.focus();
-    };
-
-    tabEl.addEventListener("auxclick", (e) => {
-      if (e.button === 1) {
-        e.preventDefault();
-        closeTab(tab.id);
-      }
     });
 
-    tabEl.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      showTabContextMenu(e.clientX, e.clientY, tab.id);
-    });
-
-    enableTabDrag(tabEl, tab.id);
-
-    tabsContainer.appendChild(tabEl);
+    el.appendChild(closeBtn);
+    tabsContainer.appendChild(el);
   });
 }
 
-function closeTab(id) {
-  const idx = tabs.findIndex(t => t.id === id);
-  if (idx === -1) return;
-  tabs.splice(idx, 1);
-
-  if (tabs.length === 0) {
-    createTab();
-    return;
-  }
-
-  if (activeTab === id) {
-    activeTab = tabs[Math.max(0, idx - 1)].id;
-    loadTab(getActiveTab());
-  }
-  renderTabs();
+function getActiveTab() {
+  return tabs.find(t => t.id === activeTabId) || null;
 }
 
-function loadTab(tab) {
+function loadActiveTab() {
+  const tab = getActiveTab();
   if (!tab) return;
+
   if (tab.url === HOMEPAGE) {
     browserFrame.srcdoc = `
       <style>
@@ -297,6 +286,21 @@ function loadTab(tab) {
   }
 }
 
+function closeTab(id) {
+  const idx = tabs.findIndex(t => t.id === id);
+  if (idx === -1) return;
+
+  tabs.splice(idx, 1);
+
+  if (tabs.length === 0) {
+    createTab();
+  } else {
+    activeTabId = tabs[Math.max(0, idx - 1)].id;
+    loadActiveTab();
+    renderTabs();
+  }
+}
+
 function goToURL() {
   let input = searchInput.value.trim();
   if (!input) return;
@@ -311,183 +315,217 @@ function goToURL() {
   if (!tab) return;
 
   tab.url = input;
-  loadTab(tab);
+  loadActiveTab();
   renderTabs();
 }
 
-
-// =====================
-// TAB CONTEXT MENU
-// =====================
-let contextTabId = null;
-
-function showTabContextMenu(x, y, tabId) {
-  contextTabId = tabId;
-  tabContextMenu.style.display = "flex";
-  tabContextMenu.style.left = x + "px";
-  tabContextMenu.style.top = y + "px";
-}
-
-document.addEventListener("click", () => {
-  tabContextMenu.style.display = "none";
-});
-
-tabContextMenu.addEventListener("click", (e) => {
-  const action = e.target.dataset.action;
-  const tab = tabs.find(t => t.id === contextTabId);
-  if (!tab) return;
-
-  if (action === "pin") {
-    tab.pinned = !tab.pinned;
-  } else if (action === "close") {
-    closeTab(tab.id);
-  } else if (action === "closeOthers") {
-    tabs = tabs.filter(t => t.id === tab.id);
-    activeTab = tab.id;
-    loadTab(tab);
-  } else if (action === "closeAll") {
-    tabs = [];
-    createTab();
-  }
-
-  renderTabs();
-  tabContextMenu.style.display = "none";
-});
-
-
-// =====================
-// TAB DRAG-TO-REORDER
-// =====================
-function enableTabDrag(tabEl, tabId) {
-  let startX = 0;
-  let dragging = false;
-
-  tabEl.addEventListener("mousedown", (e) => {
-    if (e.button !== 0) return;
-    dragging = true;
-    startX = e.clientX;
-    tabEl.classList.add("dragging");
-  });
-
-  document.addEventListener("mousemove", (e) => {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    tabEl.style.transform = `translateX(${dx}px)`;
-  });
-
-  document.addEventListener("mouseup", (e) => {
-    if (!dragging) return;
-    dragging = false;
-    tabEl.classList.remove("dragging");
-    tabEl.style.transform = "";
-
-    const rect = tabEl.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const siblings = Array.from(tabsContainer.children);
-
-    let targetIndex = siblings.findIndex(el => {
-      const r = el.getBoundingClientRect();
-      return centerX < r.left + r.width / 2;
-    });
-
-    const currentIndex = tabs.findIndex(t => t.id === tabId);
-    if (targetIndex === -1) targetIndex = tabs.length - 1;
-
-    const [moved] = tabs.splice(currentIndex, 1);
-    tabs.splice(targetIndex, 0, moved);
-    renderTabs();
-  });
-}
-
-
-// =====================
-// FULLSCREEN BROWSER TOGGLE
-// =====================
-let browserOpen = false;
-
-browserBtn.onclick = () => {
-  browserOpen = !browserOpen;
-
-  if (browserOpen) {
-    browserScreen.classList.add("active");
-
-    homeScreen.style.display = "none";
-    quoteBox.style.display = "none";
-    canvas.style.display = "none";
-    entertainmentMenu.style.display = "none";
-    appsMenu.style.display = "none";
-    embedScreen.style.display = "none";
-
-    if (tabs.length === 0) createTab();
-    searchInput.focus();
-  } else {
-    browserScreen.classList.remove("active");
-
-    homeScreen.style.display = "flex";
-    quoteBox.style.display = "block";
-    canvas.style.display = "block";
-  }
-};
-
-addTabBtn.onclick = () => {
+addTabBtn.addEventListener("click", () => {
+  playUISound();
   createTab();
-  searchInput.focus();
-};
-goBtn.onclick = goToURL;
+});
+
+goBtn.addEventListener("click", () => {
+  playUISound();
+  goToURL();
+});
 
 searchInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") goToURL();
 });
 
-closeBrowser.onclick = () => {
-  browserOpen = false;
-  browserScreen.classList.remove("active");
+browserIcon.addEventListener("click", () => {
+  playUISound();
+  hideHome();
 
-  homeScreen.style.display = "flex";
-  quoteBox.style.display = "block";
-  canvas.style.display = "block";
-};
+  gamesMenu.style.display = "none";
+  appsMenu.style.display = "none";
+  embedScreen.style.display = "none";
+  settingsScreen.style.display = "none";
 
+  browserScreen.style.display = "flex";
+  browserOpen = true;
 
-// =====================
-// KEYBOARD SHORTCUTS
-// =====================
-document.addEventListener("keydown", (e) => {
-  if (!browserOpen) return;
-
-  const ctrl = e.ctrlKey || e.metaKey;
-
-  if (ctrl && e.key.toLowerCase() === "t") {
-    e.preventDefault();
-    createTab();
-    searchInput.focus();
-  }
-
-  if (ctrl && e.key.toLowerCase() === "w") {
-    e.preventDefault();
-    const tab = getActiveTab();
-    if (tab) closeTab(tab.id);
-  }
-
-  if (ctrl && e.key === "Tab" && !e.shiftKey) {
-    e.preventDefault();
-    if (tabs.length === 0) return;
-    let idx = tabs.findIndex(t => t.id === activeTab);
-    idx = (idx + 1) % tabs.length;
-    activeTab = tabs[idx].id;
-    loadTab(tabs[idx]);
-    renderTabs();
-    searchInput.focus();
-  }
-
-  if (ctrl && e.key === "Tab" && e.shiftKey) {
-    e.preventDefault();
-    if (tabs.length === 0) return;
-    let idx = tabs.findIndex(t => t.id === activeTab);
-    idx = (idx - 1 + tabs.length) % tabs.length;
-    activeTab = tabs[idx].id;
-    loadTab(tabs[idx]);
-    renderTabs();
-    searchInput.focus();
-  }
+  if (tabs.length === 0) createTab();
 });
+
+closeBrowserBtn.addEventListener("click", () => {
+  playUISound();
+  browserScreen.style.display = "none";
+  browserOpen = false;
+  showHome();
+});
+
+/* ============================================================
+   SETTINGS SYSTEM
+============================================================ */
+function applyTheme(theme) {
+  document.body.className = document.body.className
+    .replace(/theme-\w+/g, "")
+    .trim();
+  document.body.classList.add("theme-" + theme);
+}
+
+function applyStyle(style) {
+  document.body.className = document.body.className
+    .replace(/style-\w+/g, "")
+    .trim();
+  document.body.classList.add("style-" + style);
+}
+
+function applyAnimations(mode) {
+  if (mode === "off") {
+    document.body.style.setProperty("scroll-behavior", "auto");
+  } else {
+    document.body.style.setProperty("scroll-behavior", "smooth");
+  }
+}
+
+function applyParticles(enabled, density) {
+  particlesEnabled = enabled;
+
+  if (density === "low") particleDensity = 60;
+  else if (density === "medium") particleDensity = 120;
+  else if (density === "high") particleDensity = 200;
+
+  createParticles();
+}
+
+function applyAmbience(enabled, volume) {
+  ambienceAudio.volume = volume;
+
+  if (enabled) {
+    ambienceAudio.play().catch(() => {});
+  } else {
+    ambienceAudio.pause();
+  }
+}
+
+function loadSettings() {
+  const saved = JSON.parse(localStorage.getItem("convYHSettings") || "{}");
+
+  const theme = saved.theme || "purple";
+  const style = saved.style || "grid";
+  const animations = saved.animations || "full";
+  const particlesOn = saved.particlesOn !== undefined ? saved.particlesOn : true;
+  const density = saved.density || "medium";
+  const ambienceOn = saved.ambienceOn || false;
+  const ambienceVol = saved.ambienceVol !== undefined ? saved.ambienceVol : 0.4;
+  const soundsOn = saved.soundsOn || false;
+
+  themeSelect.value = theme;
+  styleSelect.value = style;
+  animationSelect.value = animations;
+  particlesToggle.checked = particlesOn;
+  particleDensitySelect.value = density;
+  ambienceToggle.checked = ambienceOn;
+  ambienceVolume.value = ambienceVol;
+  soundToggle.checked = soundsOn;
+
+  uiSoundsEnabled = soundsOn;
+
+  applyTheme(theme);
+  applyStyle(style);
+  applyAnimations(animations);
+  applyParticles(particlesOn, density);
+  applyAmbience(ambienceOn, ambienceVol);
+}
+
+function saveSettings() {
+  const data = {
+    theme: themeSelect.value,
+    style: styleSelect.value,
+    animations: animationSelect.value,
+    particlesOn: particlesToggle.checked,
+    density: particleDensitySelect.value,
+    ambienceOn: ambienceToggle.checked,
+    ambienceVol: parseFloat(ambienceVolume.value),
+    soundsOn: soundToggle.checked
+  };
+
+  localStorage.setItem("convYHSettings", JSON.stringify(data));
+}
+
+/* SETTINGS EVENTS */
+themeSelect.addEventListener("change", () => {
+  applyTheme(themeSelect.value);
+  saveSettings();
+  playUISound();
+});
+
+styleSelect.addEventListener("change", () => {
+  applyStyle(styleSelect.value);
+  saveSettings();
+  playUISound();
+});
+
+animationSelect.addEventListener("change", () => {
+  applyAnimations(animationSelect.value);
+  saveSettings();
+  playUISound();
+});
+
+particlesToggle.addEventListener("change", () => {
+  applyParticles(particlesToggle.checked, particleDensitySelect.value);
+  saveSettings();
+  playUISound();
+});
+
+particleDensitySelect.addEventListener("change", () => {
+  applyParticles(particlesToggle.checked, particleDensitySelect.value);
+  saveSettings();
+  playUISound();
+});
+
+ambienceToggle.addEventListener("change", () => {
+  applyAmbience(ambienceToggle.checked, parseFloat(ambienceVolume.value));
+  saveSettings();
+  playUISound();
+});
+
+ambienceVolume.addEventListener("input", () => {
+  applyAmbience(ambienceToggle.checked, parseFloat(ambienceVolume.value));
+  saveSettings();
+});
+
+soundToggle.addEventListener("change", () => {
+  uiSoundsEnabled = soundToggle.checked;
+  saveSettings();
+  playUISound();
+});
+
+resetSettingsBtn.addEventListener("click", () => {
+  localStorage.removeItem("convYHSettings");
+  loadSettings();
+  playUISound();
+});
+
+/* OPEN/CLOSE SETTINGS */
+settingsIcon.addEventListener("click", () => {
+  playUISound();
+  hideHome();
+
+  gamesMenu.style.display = "none";
+  appsMenu.style.display = "none";
+  browserScreen.style.display = "none";
+  embedScreen.style.display = "none";
+
+  settingsScreen.style.display = "flex";
+});
+
+closeSettingsBtn.addEventListener("click", () => {
+  playUISound();
+  settingsScreen.style.display = "none";
+  showHome();
+});
+
+/* HOME ICON */
+homeIcon.addEventListener("click", () => {
+  playUISound();
+  showHome();
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+loadSettings();
+showHome();
