@@ -7,37 +7,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
-<body>
+<body class="theme-purple style-grid">
 
-  <!-- Title Bar -->
+  <!-- Ambience -->
+  <audio id="ambienceAudio" loop src="ambience.mp3"></audio>
+
+  <!-- Title -->
   <div class="title-bar">
     <div class="title-main">ConvYH V1</div>
     <div class="title-beta">In beta!</div>
   </div>
 
-  <!-- Home Screen -->
+  <!-- Background -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Home -->
   <div id="homeScreen" class="content">
     <h1>Welcome</h1>
     <p>Pick something to jump into.</p>
     <p>Version 0.1, brought to you by LarryInvictus (Darrell).</p>
   </div>
 
-  <!-- Quote Box -->
+  <!-- Quote -->
   <div class="quote-box" id="quoteBox">"Made with HTML, JS, and I forgot!"</div>
 
-  <!-- Dock -->
+  <!-- Icon Dock -->
   <div class="dock-wrapper">
     <div class="dock">
-      <button id="homeBtn">Home</button>
-      <button id="gamesBtn">Entertainment</button>
-      <button id="appsBtn">Apps</button>
-      <button id="browserBtn">Browser</button>
+      <button class="dock-icon" id="homeIcon" data-tooltip="Home"><span>🏠</span></button>
+      <button class="dock-icon" id="gamesIcon" data-tooltip="Entertainment"><span>🎮</span></button>
+      <button class="dock-icon" id="appsIcon" data-tooltip="Apps"><span>📦</span></button>
+      <button class="dock-icon" id="browserIcon" data-tooltip="Browser"><span>🌐</span></button>
+      <button class="dock-icon" id="settingsIcon" data-tooltip="Settings"><span>⚙️</span></button>
     </div>
   </div>
 
-  <!-- Entertainment Menu -->
-  <div class="menu-panel" id="gamesMenu">
-    <h3>Entertainment</h3>
+  <!-- Entertainment -->
+  <div class="menu-panel games-grid" id="gamesMenu">
     <button onclick="openEmbed('https://play2048.co/')">2048</button>
     <button onclick="openEmbed('https://chromedino.com/')">Dino Game</button>
     <button onclick="openEmbed('https://flappybird.io/')">Flappy Bird</button>
@@ -49,9 +55,8 @@
     <button onclick="openEmbed('https://retro-bowl.co/')">Retro Bowl</button>
   </div>
 
-  <!-- Apps Menu -->
-  <div class="menu-panel" id="appsMenu">
-    <h3>Apps</h3>
+  <!-- Apps -->
+  <div class="menu-panel apps-grid" id="appsMenu">
     <button onclick="openEmbed('https://www.desmos.com/scientific')">Calculator</button>
     <button onclick="openEmbed('https://notes.io')">Notes</button>
     <button onclick="openEmbed('https://www.overleaf.com')">Docs</button>
@@ -63,11 +68,24 @@
   <!-- Browser -->
   <div id="browserScreen" class="browser">
     <div class="browser-top">
+      <div id="tabs" class="tabs"></div>
+      <button id="addTab" class="add-tab">+</button>
+    </div>
+
+    <div class="browser-search">
       <input id="searchInput" type="text" placeholder="Search or enter URL" />
       <button id="goBtn">Go</button>
       <button id="closeBrowser">X</button>
     </div>
+
     <iframe id="browserFrame" class="browser-frame"></iframe>
+
+    <div id="tabContextMenu" class="tab-context-menu">
+      <div data-action="pin">Pin / Unpin</div>
+      <div data-action="close">Close</div>
+      <div data-action="closeOthers">Close others</div>
+      <div data-action="closeAll">Close all</div>
+    </div>
   </div>
 
   <!-- Embed Window -->
@@ -76,6 +94,82 @@
     <iframe id="embedFrame" class="embed-frame"></iframe>
   </div>
 
+  <!-- Settings -->
+  <div id="settingsScreen" class="settings">
+    <div class="settings-header">
+      <h2>Settings</h2>
+      <button id="closeSettings" class="settings-close">X</button>
+    </div>
+
+    <div class="settings-body">
+
+      <div class="settings-section">
+        <h3>Appearance</h3>
+        <label>UI Style
+          <select id="styleSelect">
+            <option value="grid">Grid</option>
+            <option value="cards">Cards</option>
+            <option value="list">List</option>
+            <option value="compact">Compact</option>
+            <option value="large">Large Tiles</option>
+            <option value="neon">Neon</option>
+            <option value="minimal">Minimal</option>
+            <option value="retro">Retro</option>
+          </select>
+        </label>
+
+        <label>Theme
+          <select id="themeSelect">
+            <option value="purple">Purple</option>
+            <option value="blue">Blue</option>
+            <option value="green">Green</option>
+            <option value="red">Red</option>
+            <option value="gold">Gold</option>
+            <option value="midnight">Midnight</option>
+            <option value="ice">Ice</option>
+          </select>
+        </label>
+
+        <label>Animations
+          <select id="animationSelect">
+            <option value="full">Full</option>
+            <option value="reduced">Reduced</option>
+            <option value="off">Off</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="settings-section">
+        <h3>Particles</h3>
+        <label>Enable Particles <input type="checkbox" id="particlesToggle" checked /></label>
+        <label>Density
+          <select id="particleDensity">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="settings-section">
+        <h3>Ambience</h3>
+        <label>Cold Night Ambience <input type="checkbox" id="ambienceToggle" /></label>
+        <label>Volume <input type="range" id="ambienceVolume" min="0" max="1" step="0.05" value="0.4" /></label>
+      </div>
+
+      <div class="settings-section">
+        <h3>Audio</h3>
+        <label>UI Sounds <input type="checkbox" id="soundToggle" /></label>
+      </div>
+
+      <div class="settings-section">
+        <h3>System</h3>
+        <button id="resetSettings">Reset to Defaults</button>
+      </div>
+
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
-  </html>
+              </html>
