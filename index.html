@@ -1,27 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Retro Bowl Embed Test</title>
-  <style>
-    #game-container {
-      width: 800px;
-      height: 600px;
-      border: 2px solid #333;
-      margin-top: 16px;
-    }
-<iframe src="https://retro-bowl.co" width="800" height="600"></iframe>
-    #game-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>ConvYH V1</title>
+  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
+
 <body>
-  <button id="load-retrobowl">Play Retro Bowl</button>
 
-  <div id="game-container"></div>
+  <!-- Title Bar -->
+  <div class="title-bar">
+    <div class="title-main">ConvYH V1</div>
+    <div class="title-beta">In beta!</div>
+  </div>
 
-  <script src="embed-retrobowl.js"></script>
+  <!-- Home Screen -->
+  <div id="homeScreen" class="content">
+    <h1>Welcome</h1>
+    <p>Pick something to jump into.</p>
+    <p>Version 0.1, brought to you by LarryInvictus (Darrell).</p>
+  </div>
+
+  <!-- Quote Box -->
+  <div class="quote-box" id="quoteBox">"Made with HTML, JS, and I forgot!"</div>
+
+  <!-- Dock -->
+  <div class="dock-wrapper">
+    <div class="dock">
+      <button id="homeBtn">Home</button>
+      <button id="gamesBtn">Entertainment</button>
+      <button id="appsBtn">Apps</button>
+      <button id="browserBtn">Browser</button>
+    </div>
+  </div>
+
+  <!-- Entertainment Menu -->
+  <div class="menu-panel" id="gamesMenu">
+    <h3>Entertainment</h3>
+    <button onclick="openEmbed('https://play2048.co/')">2048</button>
+    <button onclick="openEmbed('https://chromedino.com/')">Dino Game</button>
+    <button onclick="openEmbed('https://flappybird.io/')">Flappy Bird</button>
+    <button onclick="openEmbed('https://slope-game.github.io/slope/')">Slope</button>
+    <button onclick="openEmbed('https://orteil.dashnet.org/cookieclicker/')">Cookie Clicker</button>
+    <button onclick="openEmbed('https://1v1.lol/')">1v1.lol</button>
+    <button onclick="openEmbed('https://smashkarts.io/')">Smash Karts</button>
+    <button onclick="openEmbed('https://drifthunters.com/')">Drift Hunters</button>
+    <button onclick="openEmbed('https://retro-bowl.co/')">Retro Bowl</button>
+  </div>
+
+  <!-- Apps Menu -->
+  <div class="menu-panel" id="appsMenu">
+    <h3>Apps</h3>
+    <button onclick="openEmbed('https://www.desmos.com/scientific')">Calculator</button>
+    <button onclick="openEmbed('https://notes.io')">Notes</button>
+    <button onclick="openEmbed('https://www.overleaf.com')">Docs</button>
+    <button onclick="openEmbed('https://www.wikipedia.org')">Wiki</button>
+    <button onclick="openEmbed('https://codepen.io')">Code</button>
+    <button onclick="openEmbed('https://trello.com')">Tasks</button>
+  </div>
+
+  <!-- Browser -->
+  <div id="browserScreen" class="browser">
+    <div class="browser-top">
+      <input id="searchInput" type="text" placeholder="Search or enter URL" />
+      <button id="goBtn">Go</button>
+      <button id="closeBrowser">X</button>
+    </div>
+    <iframe id="browserFrame" class="browser-frame"></iframe>
+  </div>
+
+  <!-- Embed Window -->
+  <div id="embedScreen" class="embed">
+    <button id="closeEmbed" class="embed-close">X</button>
+    <iframe id="embedFrame" class="embed-frame"></iframe>
+  </div>
+
+  <script src="script.js"></script>
 </body>
-</html>
+  </html>
