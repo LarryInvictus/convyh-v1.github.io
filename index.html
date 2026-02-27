@@ -1,197 +1,98 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Axios Proxy Example</title>
-    <!-- Include Axios via CDN -->
-    <script src="https://cdn.jsdelivr.net"></script>
-</head>
-<body>
-    <h1>Data from Proxied API</h1>
-    <div id="output">Loading...</div>
-
-    <script>
-        // Call YOUR API, which handles the proxy on the server side
-        axios.get('http://localhost:3000/fetch-data')
-            .then(res => {
-                document.getElementById('output').innerText = JSON.stringify(res.data);
-            })
-            .catch(err => {
-                document.getElementById('output').innerText = 'Error: ' + err.message;
-            });
-    </script>
-</body>
-</html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ConvYH V1</title>
-  <link rel="stylesheet" href="style.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <title>ConvYH V1</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+<body>
+    <canvas id="particleCanvas"></canvas>
 
-<body class="theme-purple style-grid">
+    <div id="ui-root">
+        <div id="home-screen" class="center-stack">
+            <h1 id="main-title">ConvYH V1</h1>
+            <button id="openZonesBtn" class="primary-bar">Open zones</button>
 
-  <!-- Ambience -->
-  <audio id="ambienceAudio" loop src="ambience.mp3"></audio>
+            <div class="home-buttons">
+                <button id="openAppsBtn" class="secondary-btn">Apps</button>
+                <button id="openSettingsBtn" class="secondary-btn">Settings</button>
+            </div>
+        </div>
 
-  <!-- Title -->
-  <div class="title-bar">
-    <div class="title-main">ConvYH V1</div>
-    <div class="title-beta">In beta!</div>
-  </div>
+        <div id="zonesPanel" class="panel hidden">
+            <div class="panel-header">
+                <h2>Zones</h2>
+                <button class="close-panel" data-close="zonesPanel">✕</button>
+            </div>
+            <div class="grid">
+                <!-- Replace these hrefs with your real game links later -->
+                <a href="https://example.com/game1" target="_blank" class="grid-item">Game 1(Give me suggestions)</a>
+                <a href="https://example.com/game2" target="_blank" class="grid-item">Game 2(Give me suggestions)</a>
+                <a href="https://example.com/game3" target="_blank" class="grid-item">Game 3(Give me suggestions)</a>
+                <a href="https://example.com/game4" target="_blank" class="grid-item">Game 4(Give me suggestions)</a>
+                <a href="https://example.com/game5" target="_blank" class="grid-item">Game 5(Give me suggestion)</a>
+                <a href="https://khonthespot.com/#zones/html/retrobowl" target="_blank" class="grid-item">Retro bowl</a>
+            </div>
+        </div>
 
-  <!-- Background -->
-  <canvas id="particleCanvas"></canvas>
+        <div id="appsPanel" class="panel hidden">
+            <div class="panel-header">
+                <h2>Apps</h2>
+                <button class="close-panel" data-close="appsPanel">✕</button>
+            </div>
 
-  <!-- Home -->
-  <div id="homeScreen" class="content">
-    <h1>Welcome</h1>
-    <p>Pick something to jump into.</p>
-    <p>Version 0.1, brought to you by LarryInvictus (Darrell).</p>
-  </div>
+            <div class="apps-grid">
+                <div class="app-card">
+                    <h3>Calculator</h3>
+                    <input type="number" id="calcA" placeholder="A">
+                    <input type="number" id="calcB" placeholder="B">
+                    <div class="calc-buttons">
+                        <button data-op="add">+</button>
+                        <button data-op="sub">−</button>
+                        <button data-op="mul">×</button>
+                        <button data-op="div">÷</button>
+                    </div>
+                    <div class="calc-result">
+                        Result: <span id="calcResult">0</span>
+                    </div>
+                </div>
 
-  <!-- Quote -->
-  <div class="quote-box" id="quoteBox">"Made with HTML, JS, and I forgot!"</div>
+                <div class="app-card">
+                    <h3>Notes</h3>
+                    <textarea id="notesArea" placeholder="Write your notes here..."></textarea>
+                </div>
+            </div>
+        </div>
 
-  <!-- Icon Dock -->
-  <div class="dock-wrapper">
-    <div class="dock">
-      <button class="dock-icon" id="homeIcon" data-tooltip="Home"><span>🏠</span></button>
-      <button class="dock-icon" id="gamesIcon" data-tooltip="Entertainment"><span>🎮</span></button>
-      <button class="dock-icon" id="appsIcon" data-tooltip="Apps"><span>📦</span></button>
-      <button class="dock-icon" id="browserIcon" data-tooltip="Browser"><span>🌐</span></button>
-      <button class="dock-icon" id="settingsIcon" data-tooltip="Settings"><span>⚙️</span></button>
-    </div>
-  </div>
+        <div id="settingsPanel" class="panel hidden">
+            <div class="panel-header">
+                <h2>Settings</h2>
+                <button class="close-panel" data-close="settingsPanel">✕</button>
+            </div>
 
-  <!-- Entertainment -->
-  <div class="menu-panel games-grid" id="gamesMenu">
-    <button onclick="openEmbed('https://play2048.co/')">2048</button>
-    <button onclick="openEmbed('https://chromedino.com/')">Dino Game</button>
-    <button onclick="openEmbed('https://flappybird.io/')">Flappy Bird</button>
-    <button onclick="openEmbed('https://slope-game.github.io/slope/')">Slope</button>
-    <button onclick="openEmbed('https://orteil.dashnet.org/cookieclicker/')">Cookie Clicker</button>
-    <button onclick="openEmbed('https://1v1.lol/')">1v1.lol</button>
-    <button onclick="openEmbed('https://smashkarts.io/')">Smash Karts</button>
-    <button onclick="openEmbed('https://drifthunters.com/')">Drift Hunters</button>
-    <button onclick="openEmbed('https://darrell.capemaycityschool.org/zones/html/retrobowl/')">Retro Bowl</button>
-  </div>
+            <div class="settings-section">
+                <h3>Particles</h3>
+                <label class="toggle-row">
+                    <span>Enable background particles</span>
+                    <input type="checkbox" id="particlesToggle">
+                </label>
+            </div>
 
-  <!-- Apps -->
-  <div class="menu-panel apps-grid" id="appsMenu">
-    <button onclick="openEmbed('https://www.desmos.com/scientific')">Calculator</button>
-    <button onclick="openEmbed('https://notes.io')">Notes</button>
-    <button onclick="openEmbed('https://www.overleaf.com')">Docs</button>
-    <button onclick="openEmbed('https://www.wikipedia.org')">Wiki</button>
-    <button onclick="openEmbed('https://codepen.io')">Code</button>
-    <button onclick="openEmbed('https://trello.com')">Tasks</button>
-  </div>
-
-  <!-- Browser -->
-  <div id="browserScreen" class="browser">
-    <div class="browser-top">
-      <div id="tabs" class="tabs"></div>
-      <button id="addTab" class="add-tab">+</button>
-    </div>
-
-    <div class="browser-search">
-      <input id="searchInput" type="text" placeholder="Search or enter URL" />
-      <button id="goBtn">Go</button>
-      <button id="closeBrowser">X</button>
-    </div>
-
-    <iframe id="browserFrame" class="browser-frame"></iframe>
-
-    <div id="tabContextMenu" class="tab-context-menu">
-      <div data-action="pin">Pin / Unpin</div>
-      <div data-action="close">Close</div>
-      <div data-action="closeOthers">Close others</div>
-      <div data-action="closeAll">Close all</div>
-    </div>
-  </div>
-
-  <!-- Embed Window -->
-  <div id="embedScreen" class="embed">
-    <button id="closeEmbed" class="embed-close">X</button>
-    <iframe id="embedFrame" class="embed-frame"></iframe>
-  </div>
-
-  <!-- Settings -->
-  <div id="settingsScreen" class="settings">
-    <div class="settings-header">
-      <h2>Settings</h2>
-      <button id="closeSettings" class="settings-close">X</button>
+            <div class="settings-section">
+                <h3>Save data</h3>
+                <div class="settings-row">
+                    <button id="downloadSaveBtn" class="secondary-btn">Download save data</button>
+                </div>
+                <div class="settings-row">
+                    <label class="file-label">
+                        Insert your save data
+                        <input type="file" id="uploadSaveInput" accept="application/json">
+                    </label>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="settings-body">
-
-      <div class="settings-section">
-        <h3>Appearance</h3>
-        <label>UI Style
-          <select id="styleSelect">
-            <option value="grid">Grid</option>
-            <option value="cards">Cards</option>
-            <option value="list">List</option>
-            <option value="compact">Compact</option>
-            <option value="large">Large Tiles</option>
-            <option value="neon">Neon</option>
-            <option value="minimal">Minimal</option>
-            <option value="retro">Retro</option>
-          </select>
-        </label>
-
-        <label>Theme
-          <select id="themeSelect">
-            <option value="purple">Purple</option>
-            <option value="blue">Blue</option>
-            <option value="green">Green</option>
-            <option value="red">Red</option>
-            <option value="gold">Gold</option>
-            <option value="midnight">Midnight</option>
-            <option value="ice">Ice</option>
-          </select>
-        </label>
-
-        <label>Animations
-          <select id="animationSelect">
-            <option value="full">Full</option>
-            <option value="reduced">Reduced</option>
-            <option value="off">Off</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="settings-section">
-        <h3>Particles</h3>
-        <label>Enable Particles <input type="checkbox" id="particlesToggle" checked /></label>
-        <label>Density
-          <select id="particleDensity">
-            <option value="low">Low</option>
-            <option value="medium" selected>Medium</option>
-            <option value="high">High</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="settings-section">
-        <h3>Ambience</h3>
-        <label>Cold Night Ambience <input type="checkbox" id="ambienceToggle" /></label>
-        <label>Volume <input type="range" id="ambienceVolume" min="0" max="1" step="0.05" value="0.4" /></label>
-      </div>
-
-      <div class="settings-section">
-        <h3>Audio</h3>
-        <label>UI Sounds <input type="checkbox" id="soundToggle" /></label>
-      </div>
-
-      <div class="settings-section">
-        <h3>System</h3>
-        <button id="resetSettings">Reset to Defaults</button>
-      </div>
-
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
-              </html>
+</html>
