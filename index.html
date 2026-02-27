@@ -1,4 +1,26 @@
 <!DOCTYPE html>
+<html>
+<head>
+    <title>Axios Proxy Example</title>
+    <!-- Include Axios via CDN -->
+    <script src="https://cdn.jsdelivr.net"></script>
+</head>
+<body>
+    <h1>Data from Proxied API</h1>
+    <div id="output">Loading...</div>
+
+    <script>
+        // Call YOUR API, which handles the proxy on the server side
+        axios.get('http://localhost:3000/fetch-data')
+            .then(res => {
+                document.getElementById('output').innerText = JSON.stringify(res.data);
+            })
+            .catch(err => {
+                document.getElementById('output').innerText = 'Error: ' + err.message;
+            });
+    </script>
+</body>
+</html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
