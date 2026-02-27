@@ -1,531 +1,307 @@
-/* ============================================================
-   ELEMENT REFERENCES
-============================================================ */
+// =========================
+// Particle background
+// =========================
+
 const canvas = document.getElementById("particleCanvas");
 const ctx = canvas.getContext("2d");
 
-const homeScreen = document.getElementById("homeScreen");
-const quoteBox = document.getElementById("quoteBox");
-
-const gamesMenu = document.getElementById("gamesMenu");
-const appsMenu = document.getElementById("appsMenu");
-
-const browserScreen = document.getElementById("browserScreen");
-const tabsContainer = document.getElementById("tabs");
-const addTabBtn = document.getElementById("addTab");
-const searchInput = document.getElementById("searchInput");
-const goBtn = document.getElementById("goBtn");
-const closeBrowserBtn = document.getElementById("closeBrowser");
-const browserFrame = document.getElementById("browserFrame");
-
-const embedScreen = document.getElementById("embedScreen");
-const embedFrame = document.getElementById("embedFrame");
-const closeEmbedBtn = document.getElementById("closeEmbed");
-
-const settingsScreen = document.getElementById("settingsScreen");
-const closeSettingsBtn = document.getElementById("closeSettings");
-
-const homeIcon = document.getElementById("homeIcon");
-const gamesIcon = document.getElementById("gamesIcon");
-const appsIcon = document.getElementById("appsIcon");
-const browserIcon = document.getElementById("browserIcon");
-const settingsIcon = document.getElementById("settingsIcon");
-
-const styleSelect = document.getElementById("styleSelect");
-const themeSelect = document.getElementById("themeSelect");
-const animationSelect = document.getElementById("animationSelect");
-const particlesToggle = document.getElementById("particlesToggle");
-const particleDensitySelect = document.getElementById("particleDensity");
-const ambienceToggle = document.getElementById("ambienceToggle");
-const ambienceVolume = document.getElementById("ambienceVolume");
-const soundToggle = document.getElementById("soundToggle");
-const resetSettingsBtn = document.getElementById("resetSettings");
-
-const ambienceAudio = document.getElementById("ambienceAudio");
-
-/* ============================================================
-   GLOBAL STATE
-============================================================ */
 let particles = [];
-let particleDensity = 120;
+let animationId = null;
 let particlesEnabled = true;
 
-let tabs = [];
-let activeTabId = null;
-const HOMEPAGE = "conv-home://";
-
-let browserOpen = false;
-let uiSoundsEnabled = false;
-
-/* ============================================================
-   UTILITY FUNCTIONS
-============================================================ */
-function showHome() {
-  homeScreen.style.display = "block";
-  quoteBox.style.display = "block";
-  canvas.style.display = "block";
-
-  gamesMenu.style.display = "none";
-  appsMenu.style.display = "none";
-  browserScreen.style.display = "none";
-  embedScreen.style.display = "none";
-  settingsScreen.style.display = "none";
-}
-
-function hideHome() {
-  homeScreen.style.display = "none";
-  quoteBox.style.display = "none";
-  canvas.style.display = "none";
-}
-
-function playUISound() {
-  if (!uiSoundsEnabled) return;
-
-  try {
-    const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctxAudio.createOscillator();
-    const gain = ctxAudio.createGain();
-
-    osc.type = "square";
-    osc.frequency.value = 600;
-    gain.gain.value = 0.03;
-
-    osc.connect(gain);
-    gain.connect(ctxAudio.destination);
-
-    osc.start();
-    setTimeout(() => {
-      osc.stop();
-      ctxAudio.close();
-    }, 80);
-  } catch (e) {}
-}
-
-/* ============================================================
-   PARTICLES
-============================================================ */
 function resizeCanvas() {
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
-resizeCanvas();
-addEventListener("resize", resizeCanvas);
 
-function createParticles() {
-  particles = [];
-  for (let i = 0; i < particleDensity; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 2 + 1
-    });
-  }
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+function createParticles(count) {
+    particles = [];
+    const w = canvas.width;
+    const h = canvas.height;
+
+    for (let i = 0; i < count; i++) {
+        const size = Math.random() * 120 + 60; // big, soft blobs
+        particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            radius: size,
+            alpha: Math.random() * 0.4 + 0.2
+        });
+    }
 }
-createParticles();
 
 function drawParticles() {
-  if (!particlesEnabled) {
+    if (!particlesEnabled) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    requestAnimationFrame(drawParticles);
-    return;
-  }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "rgba(168,85,247,0.7)";
+    for (const p of particles) {
+        const gradient = ctx.createRadialGradient(
+            p.x,
+            p.y,
+            0,
+            p.x,
+            p.y,
+            p.radius
+        );
 
-  particles.forEach(p => {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fill();
+        gradient.addColorStop(0, `rgba(200, 150, 255, ${p.alpha})`);
+        gradient.addColorStop(0.3, `rgba(160, 90, 255, ${p.alpha * 0.9})`);
+        gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
 
-    p.x += p.vx;
-    p.y += p.vy;
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
 
-    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-  });
+        // Soft motion
+        p.x += p.vx;
+        p.y += p.vy;
 
-  requestAnimationFrame(drawParticles);
+        // Wrap around edges
+        if (p.x - p.radius > canvas.width) p.x = -p.radius;
+        if (p.x + p.radius < 0) p.x = canvas.width + p.radius;
+        if (p.y - p.radius > canvas.height) p.y = -p.radius;
+        if (p.y + p.radius < 0) p.y = canvas.height + p.radius;
+    }
 }
-drawParticles();
 
-/* ============================================================
-   QUOTES
-============================================================ */
-const quotes = [
-  "Man I dont know why I made this",
-  "Can someone like...tell Roblox to chill",
-  "Originally made with GitHub",
-  "Yes Kevin we all know the entertainment is broken"
-];
+function animateParticles() {
+    drawParticles();
+    animationId = requestAnimationFrame(animateParticles);
+}
 
-quoteBox.addEventListener("click", () => {
-  quoteBox.textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+createParticles(18);
+animateParticles();
+
+// =========================
+// UI elements
+// =========================
+
+const homeScreen = document.getElementById("home-screen");
+const openZonesBtn = document.getElementById("openZonesBtn");
+const openAppsBtn = document.getElementById("openAppsBtn");
+const openSettingsBtn = document.getElementById("openSettingsBtn");
+
+const zonesPanel = document.getElementById("zonesPanel");
+const appsPanel = document.getElementById("appsPanel");
+const settingsPanel = document.getElementById("settingsPanel");
+
+const closeButtons = document.querySelectorAll(".close-panel");
+
+// Apps
+const calcA = document.getElementById("calcA");
+const calcB = document.getElementById("calcB");
+const calcButtons = document.querySelectorAll(".calc-buttons button");
+const calcResultSpan = document.getElementById("calcResult");
+const notesArea = document.getElementById("notesArea");
+
+// Settings
+const particlesToggle = document.getElementById("particlesToggle");
+const downloadSaveBtn = document.getElementById("downloadSaveBtn");
+const uploadSaveInput = document.getElementById("uploadSaveInput");
+
+// =========================
+// Panel logic
+// =========================
+
+function showPanel(panel) {
+    panel.classList.remove("hidden");
+}
+
+function hidePanel(panel) {
+    panel.classList.add("hidden");
+}
+
+openZonesBtn.addEventListener("click", () => {
+    // Replace title + bar with zones panel
+    homeScreen.classList.add("hidden");
+    showPanel(zonesPanel);
 });
 
-/* ============================================================
-   MENUS (ENTERTAINMENT / APPS)
-============================================================ */
-function toggleMenu(menu) {
-  const isOpen = menu.style.display === "block";
-  gamesMenu.style.display = "none";
-  appsMenu.style.display = "none";
-
-  if (!isOpen) menu.style.display = "block";
-}
-
-gamesIcon.addEventListener("click", () => {
-  playUISound();
-  toggleMenu(gamesMenu);
+openAppsBtn.addEventListener("click", () => {
+    showPanel(appsPanel);
 });
 
-appsIcon.addEventListener("click", () => {
-  playUISound();
-  toggleMenu(appsMenu);
+openSettingsBtn.addEventListener("click", () => {
+    showPanel(settingsPanel);
 });
 
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".dock") && !e.target.closest(".menu-panel")) {
-    gamesMenu.style.display = "none";
-    appsMenu.style.display = "none";
-  }
-});
+closeButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        const targetId = btn.getAttribute("data-close");
+        const panel = document.getElementById(targetId);
+        hidePanel(panel);
 
-/* ============================================================
-   EMBED SYSTEM
-============================================================ */
-function openEmbed(url) {
-  playUISound();
-  hideHome();
-
-  gamesMenu.style.display = "none";
-  appsMenu.style.display = "none";
-  browserScreen.style.display = "none";
-  settingsScreen.style.display = "none";
-
-  embedScreen.style.display = "flex";
-  embedFrame.src = url;
-}
-
-closeEmbedBtn.addEventListener("click", () => {
-  playUISound();
-  embedScreen.style.display = "none";
-  embedFrame.src = "";
-  showHome();
-});
-
-/* ============================================================
-   BROWSER SYSTEM
-============================================================ */
-function createTab(url = HOMEPAGE) {
-  const id = Date.now() + Math.random();
-  tabs.push({ id, url });
-  activeTabId = id;
-  renderTabs();
-  loadActiveTab();
-}
-
-function renderTabs() {
-  tabsContainer.innerHTML = "";
-
-  tabs.forEach(tab => {
-    const el = document.createElement("div");
-    el.className = "tab" + (tab.id === activeTabId ? " active" : "");
-    el.textContent = tab.url === HOMEPAGE ? "Home" : tab.url.replace(/^https?:\/\//, "").slice(0, 15);
-
-    el.addEventListener("click", () => {
-      activeTabId = tab.id;
-      loadActiveTab();
-      renderTabs();
-    });
-
-    const closeBtn = document.createElement("span");
-    closeBtn.textContent = " ×";
-    closeBtn.style.cursor = "pointer";
-    closeBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      closeTab(tab.id);
-    });
-
-    el.appendChild(closeBtn);
-    tabsContainer.appendChild(el);
-  });
-}
-
-function getActiveTab() {
-  return tabs.find(t => t.id === activeTabId) || null;
-}
-
-function loadActiveTab() {
-  const tab = getActiveTab();
-  if (!tab) return;
-
-  if (tab.url === HOMEPAGE) {
-    browserFrame.srcdoc = `
-      <style>
-        body {
-          background: #000;
-          color: #a855f7;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          font-size: 2rem;
-          font-family: Arial, sans-serif;
+        // If zones panel closes, bring home back
+        if (panel === zonesPanel) {
+            homeScreen.classList.remove("hidden");
         }
-      </style>
-      <div>Search something!</div>
-    `;
-    searchInput.value = "";
-  } else {
-    browserFrame.srcdoc = "";
-    browserFrame.src = tab.url;
-    searchInput.value = tab.url;
-  }
-}
-
-function closeTab(id) {
-  const idx = tabs.findIndex(t => t.id === id);
-  if (idx === -1) return;
-
-  tabs.splice(idx, 1);
-
-  if (tabs.length === 0) {
-    createTab();
-  } else {
-    activeTabId = tabs[Math.max(0, idx - 1)].id;
-    loadActiveTab();
-    renderTabs();
-  }
-}
-
-function goToURL() {
-  let input = searchInput.value.trim();
-  if (!input) return;
-
-  if (input.includes(" ")) {
-    input = "https://duckduckgo.com/?q=" + encodeURIComponent(input);
-  } else if (!input.startsWith("http")) {
-    input = "https://" + input;
-  }
-
-  const tab = getActiveTab();
-  if (!tab) return;
-
-  tab.url = input;
-  loadActiveTab();
-  renderTabs();
-}
-
-addTabBtn.addEventListener("click", () => {
-  playUISound();
-  createTab();
+    });
 });
 
-goBtn.addEventListener("click", () => {
-  playUISound();
-  goToURL();
-});
+// =========================
+// Calculator logic
+// =========================
 
-searchInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") goToURL();
-});
+function calculate(op) {
+    const a = parseFloat(calcA.value || "0");
+    const b = parseFloat(calcB.value || "0");
+    let result = 0;
 
-browserIcon.addEventListener("click", () => {
-  playUISound();
-  hideHome();
+    switch (op) {
+        case "add":
+            result = a + b;
+            break;
+        case "sub":
+            result = a - b;
+            break;
+        case "mul":
+            result = a * b;
+            break;
+        case "div":
+            result = b !== 0 ? a / b : 0;
+            break;
+    }
 
-  gamesMenu.style.display = "none";
-  appsMenu.style.display = "none";
-  embedScreen.style.display = "none";
-  settingsScreen.style.display = "none";
-
-  browserScreen.style.display = "flex";
-  browserOpen = true;
-
-  if (tabs.length === 0) createTab();
-});
-
-closeBrowserBtn.addEventListener("click", () => {
-  playUISound();
-  browserScreen.style.display = "none";
-  browserOpen = false;
-  showHome();
-});
-
-/* ============================================================
-   SETTINGS SYSTEM
-============================================================ */
-function applyTheme(theme) {
-  document.body.className = document.body.className
-    .replace(/theme-\w+/g, "")
-    .trim();
-  document.body.classList.add("theme-" + theme);
+    calcResultSpan.textContent = result;
+    localStorage.setItem("conv_calc_result", String(result));
 }
 
-function applyStyle(style) {
-  document.body.className = document.body.className
-    .replace(/style-\w+/g, "")
-    .trim();
-  document.body.classList.add("style-" + style);
-}
-
-function applyAnimations(mode) {
-  if (mode === "off") {
-    document.body.style.setProperty("scroll-behavior", "auto");
-  } else {
-    document.body.style.setProperty("scroll-behavior", "smooth");
-  }
-}
-
-function applyParticles(enabled, density) {
-  particlesEnabled = enabled;
-
-  if (density === "low") particleDensity = 60;
-  else if (density === "medium") particleDensity = 120;
-  else if (density === "high") particleDensity = 200;
-
-  createParticles();
-}
-
-function applyAmbience(enabled, volume) {
-  ambienceAudio.volume = volume;
-
-  if (enabled) {
-    ambienceAudio.play().catch(() => {});
-  } else {
-    ambienceAudio.pause();
-  }
-}
-
-function loadSettings() {
-  const saved = JSON.parse(localStorage.getItem("convYHSettings") || "{}");
-
-  const theme = saved.theme || "purple";
-  const style = saved.style || "grid";
-  const animations = saved.animations || "full";
-  const particlesOn = saved.particlesOn !== undefined ? saved.particlesOn : true;
-  const density = saved.density || "medium";
-  const ambienceOn = saved.ambienceOn || false;
-  const ambienceVol = saved.ambienceVol !== undefined ? saved.ambienceVol : 0.4;
-  const soundsOn = saved.soundsOn || false;
-
-  themeSelect.value = theme;
-  styleSelect.value = style;
-  animationSelect.value = animations;
-  particlesToggle.checked = particlesOn;
-  particleDensitySelect.value = density;
-  ambienceToggle.checked = ambienceOn;
-  ambienceVolume.value = ambienceVol;
-  soundToggle.checked = soundsOn;
-
-  uiSoundsEnabled = soundsOn;
-
-  applyTheme(theme);
-  applyStyle(style);
-  applyAnimations(animations);
-  applyParticles(particlesOn, density);
-  applyAmbience(ambienceOn, ambienceVol);
-}
-
-function saveSettings() {
-  const data = {
-    theme: themeSelect.value,
-    style: styleSelect.value,
-    animations: animationSelect.value,
-    particlesOn: particlesToggle.checked,
-    density: particleDensitySelect.value,
-    ambienceOn: ambienceToggle.checked,
-    ambienceVol: parseFloat(ambienceVolume.value),
-    soundsOn: soundToggle.checked
-  };
-
-  localStorage.setItem("convYHSettings", JSON.stringify(data));
-}
-
-/* SETTINGS EVENTS */
-themeSelect.addEventListener("change", () => {
-  applyTheme(themeSelect.value);
-  saveSettings();
-  playUISound();
+calcButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        const op = btn.getAttribute("data-op");
+        calculate(op);
+    });
 });
 
-styleSelect.addEventListener("change", () => {
-  applyStyle(styleSelect.value);
-  saveSettings();
-  playUISound();
+// =========================
+// Notes logic
+// =========================
+
+function loadNotes() {
+    const saved = localStorage.getItem("conv_notes");
+    if (saved !== null) {
+        notesArea.value = saved;
+    }
+}
+
+notesArea.addEventListener("input", () => {
+    localStorage.setItem("conv_notes", notesArea.value);
 });
 
-animationSelect.addEventListener("change", () => {
-  applyAnimations(animationSelect.value);
-  saveSettings();
-  playUISound();
-});
+// =========================
+// Settings: particles toggle
+// =========================
+
+function applyParticlesSetting(enabled) {
+    particlesEnabled = enabled;
+    if (!enabled) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    localStorage.setItem("conv_particles_enabled", enabled ? "1" : "0");
+}
 
 particlesToggle.addEventListener("change", () => {
-  applyParticles(particlesToggle.checked, particleDensitySelect.value);
-  saveSettings();
-  playUISound();
+    applyParticlesSetting(particlesToggle.checked);
 });
 
-particleDensitySelect.addEventListener("change", () => {
-  applyParticles(particlesToggle.checked, particleDensitySelect.value);
-  saveSettings();
-  playUISound();
+// =========================
+// Save data export/import
+// =========================
+
+function buildSaveData() {
+    return {
+        version: "1.0",
+        timestamp: new Date().toISOString(),
+        notes: localStorage.getItem("conv_notes") || "",
+        calculatorResult: localStorage.getItem("conv_calc_result") || "0",
+        settings: {
+            particlesEnabled: localStorage.getItem("conv_particles_enabled") === "1"
+        }
+        // You can extend this with game progress, etc.
+    };
+}
+
+function downloadSaveData() {
+    const data = buildSaveData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "convYH-save.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+downloadSaveBtn.addEventListener("click", downloadSaveData);
+
+uploadSaveInput.addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            if (typeof data.notes === "string") {
+                localStorage.setItem("conv_notes", data.notes);
+                notesArea.value = data.notes;
+            }
+
+            if (typeof data.calculatorResult === "string") {
+                localStorage.setItem("conv_calc_result", data.calculatorResult);
+                calcResultSpan.textContent = data.calculatorResult;
+            }
+
+            if (data.settings && typeof data.settings.particlesEnabled === "boolean") {
+                const enabled = data.settings.particlesEnabled;
+                particlesToggle.checked = enabled;
+                applyParticlesSetting(enabled);
+            }
+
+            // Reset file input so same file can be reloaded if needed
+            uploadSaveInput.value = "";
+        } catch (err) {
+            console.error("Invalid save data:", err);
+        }
+    };
+    reader.readAsText(file);
 });
 
-ambienceToggle.addEventListener("change", () => {
-  applyAmbience(ambienceToggle.checked, parseFloat(ambienceVolume.value));
-  saveSettings();
-  playUISound();
-});
+// =========================
+// Initial load
+// =========================
 
-ambienceVolume.addEventListener("input", () => {
-  applyAmbience(ambienceToggle.checked, parseFloat(ambienceVolume.value));
-  saveSettings();
-});
+function initFromStorage() {
+    // Notes
+    loadNotes();
 
-soundToggle.addEventListener("change", () => {
-  uiSoundsEnabled = soundToggle.checked;
-  saveSettings();
-  playUISound();
-});
+    // Calculator result
+    const savedResult = localStorage.getItem("conv_calc_result");
+    if (savedResult !== null) {
+        calcResultSpan.textContent = savedResult;
+    }
 
-resetSettingsBtn.addEventListener("click", () => {
-  localStorage.removeItem("convYHSettings");
-  loadSettings();
-  playUISound();
-});
+    // Particles setting
+    const savedParticles = localStorage.getItem("conv_particles_enabled");
+    const enabled = savedParticles !== "0"; // default: on
+    particlesToggle.checked = enabled;
+    applyParticlesSetting(enabled);
+}
 
-/* OPEN/CLOSE SETTINGS */
-settingsIcon.addEventListener("click", () => {
-  playUISound();
-  hideHome();
-
-  gamesMenu.style.display = "none";
-  appsMenu.style.display = "none";
-  browserScreen.style.display = "none";
-  embedScreen.style.display = "none";
-
-  settingsScreen.style.display = "flex";
-});
-
-closeSettingsBtn.addEventListener("click", () => {
-  playUISound();
-  settingsScreen.style.display = "none";
-  showHome();
-});
-
-/* HOME ICON */
-homeIcon.addEventListener("click", () => {
-  playUISound();
-  showHome();
-});
-
-/* ============================================================
-   INIT
-============================================================ */
-loadSettings();
-showHome();
+initFromStorage();
