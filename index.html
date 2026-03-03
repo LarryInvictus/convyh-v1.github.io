@@ -31,7 +31,7 @@
   <!-- Quote -->
   <div class="quote-box" id="quoteBox">"Made with HTML, JS, and I forgot!"</div>
 
-  <!-- Dock (WORDS instead of icons) -->
+  <!-- Dock (words) -->
   <div class="dock-wrapper">
     <div class="dock">
       <button class="dock-btn" id="homeBtn">Home</button>
@@ -158,6 +158,26 @@
     </div>
   </div>
 
+  <!-- Admin Code Editor Overlay -->
+  <div id="adminEditor" class="admin-editor">
+    <div class="admin-header">
+      <h2>Admin Code Editor</h2>
+      <button id="closeAdmin" class="admin-close">X</button>
+    </div>
+
+    <div class="admin-tabs">
+      <button data-tab="htmlTab">HTML</button>
+      <button data-tab="cssTab">CSS</button>
+      <button data-tab="jsTab">JS</button>
+    </div>
+
+    <div class="admin-content">
+      <textarea id="htmlTab" class="admin-tab"></textarea>
+      <textarea id="cssTab" class="admin-tab"></textarea>
+      <textarea id="jsTab" class="admin-tab"></textarea>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
-                </html>
+      </html>
