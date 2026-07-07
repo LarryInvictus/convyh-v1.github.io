@@ -1,268 +1,81 @@
-/* Base */
-* { box-sizing: border-box; }
-
-body, html {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-  background: #050509;
-  color: white;
-
-  /* Prevent title overlap */
-  padding-top: 120px;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0a0a0a;
+    overflow: hidden;
 }
 
-/* Themes */
-body.theme-purple { --accent: #a855f7; --accent-soft: rgba(168,85,247,0.35); }
-body.theme-blue   { --accent: #3b82f6; --accent-soft: rgba(59,130,246,0.35); }
-body.theme-green  { --accent: #22c55e; --accent-soft: rgba(34,197,94,0.35); }
-body.theme-red    { --accent: #ef4444; --accent-soft: rgba(239,68,68,0.35); }
-body.theme-gold   { --accent: #facc15; --accent-soft: rgba(250,204,21,0.35); }
-body.theme-midnight { --accent: #1e3a8a; --accent-soft: rgba(30,58,138,0.35); }
-body.theme-ice    { --accent: #38bdf8; --accent-soft: rgba(56,189,248,0.35); }
-
-/* Title */
-.title-bar {
-  position: fixed;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  display: flex;
-  justify-content: space-between;
-  z-index: 20;
-  pointer-events: none;
+/* Purple flare background */
+.flare-bg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(140, 0, 255, 0.6), transparent 70%);
+    filter: blur(80px);
+    z-index: -1;
 }
 
-.title-main {
-  font-size: 2.4rem;
-  font-weight: 700;
-  color: var(--accent);
-  text-shadow: 0 0 10px var(--accent);
+.container {
+    text-align: center;
+    margin-top: 60px;
 }
 
-.title-beta {
-  font-size: 1rem;
-  opacity: 0.8;
-  transform: rotate(-10deg);
+.title {
+    color: #d8b4ff;
+    font-size: 48px;
+    font-weight: bold;
+    text-shadow: 0 0 20px #8a2be2;
 }
 
-/* Canvas */
-#particleCanvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
+/* Search bar */
+.search-bar {
+    width: 60%;
+    padding: 12px;
+    margin-top: 25px;
+    border-radius: 8px;
+    border: none;
+    background: #1a1a1a;
+    color: #d8b4ff;
+    font-size: 18px;
+    box-shadow: 0 0 10px #8a2be2;
 }
 
-/* Home */
-.content {
-  position: relative;
-  margin: 0 auto;
-  text-align: center;
-  padding-top: 40px;
-  z-index: 1;
-}
-
-/* Quote */
-.quote-box {
-  position: fixed;
-  top: 140px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 1rem 2rem;
-  background: rgba(24,24,27,0.7);
-  border: 1px solid var(--accent);
-  border-radius: 14px;
-  color: var(--accent);
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  z-index: 2;
-}
-
-/* Dock */
-.dock-wrapper {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
-
-.dock {
-  display: flex;
-  gap: 1rem;
-}
-
-/* WORD-BASED DOCK BUTTONS */
-.dock-btn {
-  padding: 0.6rem 1.2rem;
-  background: #0a0a0a;
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  color: var(--accent);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.dock-btn:hover {
-  background: var(--accent-soft);
-  transform: translateY(-4px);
-  box-shadow: 0 0 12px var(--accent);
-}
-
-/* Menus */
-.menu-panel {
-  position: fixed;
-  bottom: 6rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(20,20,20,0.9);
-  border: 1px solid var(--accent);
-  border-radius: 12px;
-  padding: 1rem;
-  display: none;
-  z-index: 9;
-}
-
-/* Entertainment Grid */
-.games-grid, .apps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 0.7rem;
-}
-
-.games-grid button, .apps-grid button {
-  background: #18181b;
-  border: 1px solid var(--accent);
-  border-radius: 10px;
-  padding: 0.7rem;
-  color: var(--accent);
-  cursor: pointer;
-  transition: 0.15s;
-}
-
-.games-grid button:hover, .apps-grid button:hover {
-  background: var(--accent-soft);
-  transform: translateY(-2px);
-  box-shadow: 0 0 10px var(--accent);
-}
-
-/* Browser */
-.browser {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: none;
-  flex-direction: column;
-  z-index: 5;
-}
-
-.browser-top {
-  display: flex;
-  padding: 0.5rem;
-  background: #111;
-}
-
+/* Tabs */
 .tabs {
-  display: flex;
-  gap: 0.5rem;
-  flex: 1;
-  overflow-x: auto;
+    margin-top: 25px;
 }
 
 .tab {
-  padding: 0.4rem 0.8rem;
-  background: #222;
-  border-radius: 6px;
-  cursor: pointer;
-  color: white;
+    background: #1a1a1a;
+    color: #c084fc;
+    border: 2px solid #8a2be2;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-.tab.active {
-  background: var(--accent);
-  color: black;
+.tab:hover {
+    background: #8a2be2;
+    color: white;
 }
 
-.add-tab {
-  background: var(--accent);
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
+/* Game button */
+.game-btn {
+    margin-top: 35px;
+    padding: 15px 40px;
+    background: #8a2be2;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 0 20px #8a2be2;
+    transition: 0.25s;
 }
 
-.browser-search {
-  display: flex;
-  padding: 0.5rem;
-  background: #111;
-  gap: 0.5rem;
+.game-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px #b56cff;
 }
-
-.browser-frame {
-  flex: 1;
-  border: none;
-}
-
-/* Embed */
-.embed {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  display: none;
-  flex-direction: column;
-  z-index: 6;
-}
-
-.embed-close {
-  background: var(--accent);
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  margin: 0.5rem;
-  cursor: pointer;
-}
-
-.embed-frame {
-  flex: 1;
-  border: none;
-}
-
-/* Settings */
-.settings {
-  position: fixed;
-  inset: 0;
-  background: #050509;
-  display: none;
-  flex-direction: column;
-  z-index: 7;
-  padding: 1rem;
-}
-
-.settings-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.settings-body {
-  margin-top: 1rem;
-  overflow-y: auto;
-}
-
-.settings-section {
-  background: rgba(20,20,20,0.7);
-  border: 1px solid var(--accent);
-  padding: 1rem;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-}
-
-.settings-close {
-  background: var(--accent);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-      }
