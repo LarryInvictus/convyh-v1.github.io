@@ -8,21 +8,32 @@
 <body>
     <div class="flare-bg"></div>
 
-    <div class="container">
-        <h1 class="title">ConvYH V3</h1>
+    <div class="shell">
+        <header class="top-bar">
+            <h1 class="logo">ConvYH V3</h1>
+        </header>
 
-        <input type="text" class="search-bar" placeholder="Search...">
+        <main class="main">
+            <div class="search-row">
+                <input id="searchInput" type="text" placeholder="Search proxies, games, tools...">
+                <button id="searchBtn">Search</button>
+            </div>
 
-        <div class="tabs">
-            <button class="tab">Home</button>
-            <button class="tab">Games</button>
-            <button class="tab">Tools</button>
-            <button class="tab">Settings</button>
-        </div>
+            <div class="tabs">
+                <button class="tab active" data-filter="all">All</button>
+                <button class="tab" data-filter="proxy">Proxies</button>
+                <button class="tab" data-filter="game">Games</button>
+                <button class="tab" data-filter="tool">Tools</button>
+            </div>
 
-        <button class="game-btn">Launch Game</button>
+            <button class="game-main-btn">Random Game Proxy</button>
+
+            <div id="results" class="results-grid">
+                <!-- JS injects cards here -->
+            </div>
+        </main>
     </div>
 
     <script src="script.js"></script>
 </body>
-</html>
+    </html>
